@@ -1,3 +1,4 @@
+/*
 import React, { useState } from 'react';
 import axios from 'axios';
 import "./Register.css";
@@ -73,3 +74,86 @@ const Login = ({ onLoginSuccess }) => {
 };
 
 export default Login;
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+import React, { useState } from 'react';
+import axios from 'axios';
+
+const Login = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await axios.post('http://127.0.0.1:5000/login', {
+                email,
+                password,
+            });
+            // Handle successful login here
+            console.log(response.data);
+        } catch (error) {
+            if (error.response) {
+                // Request made and server responded
+                setError(error.response.data.message || 'Login failed');
+            } else {
+                // Something happened in setting up the request
+                setError('An error occurred while logging in.');
+            }
+        }
+    };
+
+    return (
+        <form onSubmit={handleSubmit}>
+            <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+            />
+            <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+            />
+            <button type="submit">Login</button>
+            {error && <p>{error}</p>}
+        </form>
+    );
+};
+
+export default Login;
+
+
+
+
+
+
+
+
+
+

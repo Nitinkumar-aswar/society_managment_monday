@@ -6,6 +6,7 @@ import bcrypt
 from flask_mysqldb import MySQL
 from flask_cors import CORS
 import os
+from email_validator import validate_email, EmailNotValidError
 
 app = Flask(__name__, 
             static_folder='../Frontend/myapp/build',
@@ -20,7 +21,6 @@ app.config['MYSQL_DB'] = 'registerdatabase'
 app.secret_key = os.getenv('SECRET_KEY', os.urandom(24))
 
 mysql = MySQL(app)
-
 CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:3000"}})
 
 # Forms and Validation
@@ -48,64 +48,71 @@ class LoginForm(FlaskForm):
 def index():
     return send_from_directory(app.static_folder, 'index.html')
 
-# API routes
 @app.route('/register', methods=['POST'])
 def register():
-    data = request.get_json()  # Parse JSON data from the request
+    data = request.get_json()
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
 
-    # Validation logic
-    if not username or not email or not password:
+    # Validate inputs
+    if not all([username, email, password]):
         return jsonify({'errors': ['All fields are required']}), 400
 
     if len(password) < 8:
         return jsonify({'errors': ['Password must be at least 8 characters long']}), 400
 
+    # Hash the password
     hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
     try:
         cursor = mysql.connection.cursor()
-        cursor.execute("INSERT INTO register (username, email, password) VALUES (%s, %s, %s)", (username, email, hashed_password))
+        cursor.execute("INSERT INTO register (username, email, password) VALUES (%s, %s, %s)",
+                       (username, email, hashed_password))
         mysql.connection.commit()
         cursor.close()
         return jsonify({'message': 'Registration successful'}), 201
     except Exception as e:
         return jsonify({'message': 'An error occurred: ' + str(e)}), 500
 
-
 @app.route('/login', methods=['POST'])
 def login():
-    form = LoginForm(csrf_enabled=False)
-    if form.validate():
-        email = form.email.data
-        password = form.password.data
+    data = request.get_json()
+    email = data.get('email')
+    password = data.get('password')
 
+    # Validate inputs
+    if not all([email, password]):
+        return jsonify({'message': 'Email and password are required.'}), 400
+
+    try:
         cursor = mysql.connection.cursor()
         cursor.execute("SELECT * FROM register WHERE email=%s", (email,))
         user = cursor.fetchone()
         cursor.close()
-        if user and bcrypt.checkpw(password.encode('utf-8'), user[3].encode('utf-8')):
-            session['user_id'] = user[0]
-            return jsonify({'message': 'Login successful', 'user_id': user[0]}), 200
-        else:
-            return jsonify({'message': 'Login failed. Invalid credentials.'}), 401
+    except Exception as e:
+        return jsonify({'message': 'Database query error: ' + str(e)}), 500
 
-    return jsonify({'errors': form.errors}), 400
+    if user and bcrypt.checkpw(password.encode('utf-8'), user[3].encode('utf-8')):
+        session['user_id'] = user[0]
+        return jsonify({'message': 'Login successful', 'user_id': user[0]}), 200
+    else:
+        return jsonify({'message': 'Invalid credentials.'}), 401
 
 @app.route('/dashboard', methods=['GET'])
 def dashboard():
     if 'user_id' in session:
         user_id = session['user_id']
+        try:
+            cursor = mysql.connection.cursor()
+            cursor.execute("SELECT * FROM register WHERE id=%s", (user_id,))
+            user = cursor.fetchone()
+            cursor.close()
 
-        cursor = mysql.connection.cursor()
-        cursor.execute("SELECT * FROM register WHERE id=%s", (user_id,))
-        user = cursor.fetchone()
-        cursor.close()
-
-        if user:
-            return jsonify({'user': {'name': user[1], 'email': user[2]}}), 200
+            if user:
+                return jsonify({'user': {'name': user[1], 'email': user[2]}}), 200
+        except Exception as e:
+            return jsonify({'message': 'Database query error: ' + str(e)}), 500
 
     return jsonify({'message': 'Unauthorized'}), 401
 
