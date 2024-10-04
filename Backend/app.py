@@ -13,6 +13,9 @@ app = Flask(__name__,
             static_url_path='/')
 
 # MySQL Configuration
+app.config['SESSION_COOKIE_HTTPONLY'] = True  # Prevent JavaScript access to cookies
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # Or 'None' if cross-site cookies are required
+app.config['SESSION_COOKIE_SECURE'] = False  # Set to True in production with HTTPS
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_PORT'] = 3306
 app.config['MYSQL_USER'] = 'root'
@@ -21,7 +24,7 @@ app.config['MYSQL_DB'] = 'registerdatabase'
 app.secret_key = os.getenv('SECRET_KEY', os.urandom(24))
 
 mysql = MySQL(app)
-CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:3000"}})
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
 
 # Forms and Validation
 class RegisterForm(FlaskForm):
@@ -81,7 +84,6 @@ def login():
     email = data.get('email')
     password = data.get('password')
 
-    # Validate inputs
     if not all([email, password]):
         return jsonify({'message': 'Email and password are required.'}), 400
 
@@ -99,7 +101,8 @@ def login():
     else:
         return jsonify({'message': 'Invalid credentials.'}), 401
 
-@app.route('/dashboard', methods=['GET'])
+
+@app.route('/userdashboard', methods=['GET'])
 def dashboard():
     if 'user_id' in session:
         user_id = session['user_id']
@@ -115,6 +118,7 @@ def dashboard():
             return jsonify({'message': 'Database query error: ' + str(e)}), 500
 
     return jsonify({'message': 'Unauthorized'}), 401
+
 
 @app.route('/logout', methods=['POST'])
 def logout():
