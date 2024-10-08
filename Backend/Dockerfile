@@ -5,7 +5,7 @@ FROM node:20.17.0
 WORKDIR /Frontend/myapp
 
 # Copy package.json and package-lock.json (if it exists)
-COPY package*.json ./
+COPY Backend/package.json
 
 # Install dependencies
 RUN npm install
