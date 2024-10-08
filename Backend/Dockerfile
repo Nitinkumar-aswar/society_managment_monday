@@ -2,7 +2,7 @@
 FROM node:v20.17.0
 
 # Set the working directory in the container
-WORKDIR .
+WORKDIR Frontend/myapp
 
 # Copy the package.json and package-lock.json files to the container
 COPY package*.json ./
