@@ -2,7 +2,7 @@
 FROM node:20.17.0
 
 # Set the working directory
-WORKDIR Frontend/myapp
+WORKDIR /Frontend/myapp
 
 # Copy package.json and install dependencies
 COPY Frontend/myapp/package*.json ./
