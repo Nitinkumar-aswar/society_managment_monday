@@ -5,7 +5,7 @@ FROM node:20.17.0
 WORKDIR Frontend/myapp
 
 # Copy package.json and install dependencies
-COPY package*.json ./
+COPY Frontend/myapp/package.json
 RUN npm install
 
 # Copy the rest of the application files
