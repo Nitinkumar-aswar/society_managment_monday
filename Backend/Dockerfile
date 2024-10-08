@@ -5,7 +5,7 @@ FROM node:20.17.0
 WORKDIR Backend
 
 # Copy the package.json and package-lock.json files to the container
-COPY package*.json ./
+COPY Backend/package.json
 
 # Install the dependencies
 RUN npm install
