@@ -1,23 +1,20 @@
-# Use the official Node.js 20 image as the base image
+# Use the official Node.js image
 FROM node:20.17.0
 
-# Set the working directory in the container
-WORKDIR Backend
+# Set the working directory
+WORKDIR /Frontend/myapp
 
-# Copy the package.json and package-lock.json files to the container
-COPY Backend/package.json
+# Copy package.json and package-lock.json (if it exists)
+COPY package*.json ./
 
-# Install the dependencies
+# Install dependencies
 RUN npm install
 
-# Copy the rest of the application's source code to the container
+# Copy the rest of the application files
 COPY . .
 
-# Build the React.js application
-RUN npm run build
+# Expose the port your app runs on (if applicable)
+EXPOSE 3000
 
-# Expose the port that the application listens on
-EXPOSE 3001
-
-# Start a simple web server to serve the built React.js files
-CMD [ "npx", "serve", "-s", "build" ]
+# Command to run your app
+CMD ["npm", "start"]
