@@ -1,20 +1,20 @@
-# Use the official Node.js image
-FROM node:20.17.0
+# Use the official Python image from the Docker Hub
+FROM python:3.11
 
-# Set the working directory
-WORKDIR /Frontend/myapp
+# Set the working directory in the container
+WORKDIR /app
 
-# Copy package.json and package-lock.json (if it exists)
-COPY Backend/package.json
+# Copy the requirements file to the working directory
+COPY requirements.txt .
 
-# Install dependencies
-RUN npm install
+# Install the dependencies
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application files
+# Copy the rest of the backend code to the working directory
 COPY . .
 
-# Expose the port your app runs on (if applicable)
-EXPOSE 3000
+# Expose the port your backend application runs on
+EXPOSE 5000
 
-# Command to run your app
-CMD ["npm", "start"]
+# Command to run the application
+CMD ["python", "app.py"]
