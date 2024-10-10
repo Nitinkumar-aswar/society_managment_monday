@@ -12,7 +12,7 @@ RUN pip install --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the backend code to the working directory
-COPY Backend/ .  # Copy all backend files
+COPY Backend/app.py .  # Copy all backend files
 
 # Expose the port your backend application runs on
 EXPOSE 5000
