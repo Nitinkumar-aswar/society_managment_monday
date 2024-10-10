@@ -21,17 +21,17 @@ EXPOSE 5000
 CMD ["python", "app.py"]
 
 # Frontend Stage
-FROM node:16 AS frontend
+#FROM node:16 AS frontend
 
 # Set the working directory for frontend
-WORKDIR /Frontend/myapp
+#WORKDIR /Frontend/myapp
 
 # Copy frontend package files and install dependencies
-COPY Frontend/myapp/package*.json ./
-RUN npm install
+#COPY Frontend/myapp/package*.json ./
+#RUN npm install
 
 # Copy the rest of the frontend code
-COPY Frontend/myapp/ .  # Corrected path, ensure this matches your project structure
+#COPY Frontend/myapp/ .  # Corrected path, ensure this matches your project structure
 
 # Command to run the frontend application (if needed)
 # CMD ["npm", "start"]  # Uncomment if you want to run the frontend
