@@ -26,7 +26,7 @@ CMD ["python", "app.py"]
 FROM node:16 AS frontend
 
 # Set the working directory for frontend
-WORKDIR /Frontend/myapp
+COPY Frontend/myapp/. .
 
 # Copy frontend package files and install dependencies
 COPY Frontend/myapp/package*.json ./
