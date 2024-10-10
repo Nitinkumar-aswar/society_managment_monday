@@ -5,7 +5,7 @@ FROM python:3.11
 WORKDIR /Frontend/myapp
 
 # Copy the requirements file to the working directory
-COPY backend/requirements.txt .
+COPY Backend/requirements.txt ./
 
 # Install the dependencies
 RUN pip install --no-cache-dir -r requirements.txt
